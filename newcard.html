@@ -3,100 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy New Year Wishes</title>
+    <title>Send Your New Year Wish</title>
     <style>
-        /* CSS เหมือนเดิม */
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: url('christmas/bg.jpg') no-repeat center center fixed; background-size: cover; color: white; text-align: center; }
-        h1 { margin-top: 50px; font-size: 3rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
-        #wish-form { margin-top: 30px; }
-        #wish-input, #name-input { padding: 10px; font-size: 1.2rem; border: none; border-radius: 5px; width: 300px; max-width: 80%; }
-        .play-button { margin-bottom: 20px; padding: 15px 30px; font-size: 18px; font-weight: bold; color: white; background-color: #ff5733; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); transition: background-color 0.3s, transform 0.2s; }
-        .play-button:hover { background-color: #c13c22; transform: scale(1.1); }
-        .play-button:active { transform: scale(1); }
-        #wishes-list { margin-top: 50px; padding: 0 20px; }
-        #wishes-list ul { list-style: none; padding: 0; }
-        #wishes-list li { background: rgba(255, 255, 255, 0.2); margin: 10px 0; padding: 10px; border-radius: 5px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://github.com/basnakhu1999/newyear/blob/main/bg.jpg?raw=true') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 50px;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #wish-form {
+            margin-top: 30px;
+            background-color: rgba(0, 0, 0, 0.5); /* Transparent background */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            display: inline-block;
+        }
+
+        input, button {
+            padding: 10px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            width: 300px;
+            max-width: 80%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .play-button {
+            background-color: #ff5733;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .play-button:hover {
+            background-color: #c13c22;
+            transform: scale(1.1);
+        }
+
+        .play-button:active {
+            transform: scale(1);
+        }
+
+        .thank-you-message {
+            font-size: 1.5rem;
+            color: white;
+            display: none; /* Hide the message initially */
+            margin-top: 30px;
+        }
+
+        #recent-wishes {
+            margin-top: 50px;
+            font-size: 1.2rem;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
     </style>
 </head>
 <body>
-    <h1>Happy New Year Wishes</h1>
+    <h1>Send Your New Year Wish</h1>
+
     <div id="wish-form">
-        <input type="text" id="name-input" placeholder="Your Name" />
-        <input type="text" id="wish-input" placeholder="Type your wish here..." />
-        <button class="play-button" onclick="submitWish()">Submit</button>
+        <form id="wishForm" action="https://docs.google.com/forms/d/e/1FAIpQLSeTnmR0EbdnEXDZKMI-25O2DYB_rCtylNwf12rCgcVEL9s6hQ/formResponse" method="POST" target="hidden-iframe" onsubmit="showThankYouMessage(event)">
+            <input type="text" name="entry.272639539" placeholder="Your Name" required>
+            <input type="text" name="entry.1914122642" placeholder="Your Wish" required>
+            <button type="submit" class="play-button">ส่งคำอวยพร</button>
+        </form>
     </div>
-    <div id="wishes-list">
-        <h2>Recent Wishes:</h2>
-        <ul id="wishes-container"></ul>
+
+    <iframe name="hidden-iframe" style="display: none;"></iframe>
+
+    <div id="thankYouMessage" class="thank-you-message">
+        ขอบคุณที่ร่วมส่งคำอวยพร!
+    </div>
+
+    <div id="recent-wishes">
+        <h2>คำอวยพรล่าสุด</h2>
+        <ul id="wishList"></ul> <!-- รายการคำอวยพรจะไปแสดงที่นี่ -->
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycby1PorkoNJyB7qAG1ofDxBYxVo_exB-drHjNmYmFs4zg8xJJ82VxBvBQzisU5J_jLg/exec'; // Replace with your Google Apps Script URL
+        // ดึงข้อมูลจาก Google Sheets
+        const sheetUrl = "https://spreadsheets.google.com/feeds/list/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/public/values?alt=json";
+        fetch(sheetUrl)
+            .then(response => response.json())
+            .then(data => {
+                const entries = data.feed.entry;
+                const wishList = document.getElementById('wishList');
 
-        // Function to submit wish
-        async function submitWish() {
-            const name = document.getElementById('name-input').value;
-            const wish = document.getElementById('wish-input').value;
-
-            if (!name || !wish) {
-                alert('Please enter both your name and wish!');
-                return;
-            }
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({ 'name': name, 'wish': wish }),
+                // แสดงคำอวยพรล่าสุด
+                entries.forEach(entry => {
+                    const name = entry.gsx$name.$t;
+                    const wish = entry.gsx$wish.$t;
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${name} - ${wish}`;
+                    wishList.appendChild(listItem);
                 });
+            })
+            .catch(error => console.error('Error fetching data:', error));
 
-                const data = await response.json();
+        // การแสดงข้อความขอบคุณ
+        function showThankYouMessage(event) {
+            event.preventDefault(); // Prevent form submission for now
+            const form = document.getElementById('wishForm');
+            const thankYouMessage = document.getElementById('thankYouMessage');
+            form.style.display = 'none'; // Hide the form
+            thankYouMessage.style.display = 'block'; // Show the thank you message
 
-                if (data.result === 'success') {
-                    alert('Wish submitted successfully!');
-                    document.getElementById('name-input').value = '';
-                    document.getElementById('wish-input').value = '';
-                    fetchWishes();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (error) {
-                console.error('Error submitting wish:', error.message);
-                alert('Failed to submit wish. Please try again later.');
-            }
+            // Submit the form after displaying the thank you message
+            setTimeout(function() {
+                form.submit();
+            }, 2000); // Delay the form submission to allow message display
         }
-
-        // Function to fetch wishes
-        async function fetchWishes() {
-            try {
-                const response = await fetch(API_URL, { method: 'GET' });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const wishesContainer = document.getElementById('wishes-container');
-                    wishesContainer.innerHTML = '';
-
-                    if (data.wishes && data.wishes.length > 0) {
-                        data.wishes.forEach((wish) => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `${wish.name}: ${wish.wish}`;
-                            wishesContainer.appendChild(listItem);
-                        });
-                    } else {
-                        wishesContainer.innerHTML = '<li>No wishes yet!</li>';
-                    }
-                } else {
-                    console.error('Failed to fetch wishes:', await response.json());
-                }
-            } catch (error) {
-                console.error('Error fetching wishes:', error.message);
-            }
-        }
-
-        // Initialize the page
-        window.onload = fetchWishes;
     </script>
+
 </body>
 </html>
