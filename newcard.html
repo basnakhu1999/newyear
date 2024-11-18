@@ -105,7 +105,7 @@
 
         // ฟังก์ชันดึงข้อมูลจาก Google Sheets
         function drawTable() {
-            var queryString = encodeURIComponent('SELECT B, C'); // กำหนดคอลัมน์ที่ต้องการดึง (A = ชื่อ, B = คำอวยพร)
+            var queryString = encodeURIComponent('SELECT B, C OFFSET 1'); // ดึงข้อมูลจากคอลัมน์ B (ชื่อ) และ C (คำอวยพร) เริ่มจากแถวที่ 2
             var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/gviz/tq?tq=' + queryString);
             
             query.send(function(response) {
@@ -120,8 +120,8 @@
 
                 // แสดงข้อมูลคำอวยพรล่าสุด
                 for (var i = 0; i < data.getNumberOfRows(); i++) {
-                    var name = data.getValue(i, 1);  // คอลัมน์ A (ชื่อ)
-                    var wish = data.getValue(i, 2);  // คอลัมน์ B (คำอวยพร)
+                    var name = data.getValue(i, 0);  // คอลัมน์ B (ชื่อ)
+                    var wish = data.getValue(i, 1);  // คอลัมน์ C (คำอวยพร)
                     var listItem = document.createElement('li');
                     listItem.textContent = `${name} - ${wish}`;
                     wishList.appendChild(listItem);
@@ -129,8 +129,8 @@
             });
         }
 
-        // เรียกใช้งาน drawTable() ทุก 30 วินาที
-        setInterval(drawTable, 1000); // รีเฟรชทุก 30 วินาที
+        // เรียกใช้ drawTable() ทุก 1 วินาที (1000 มิลลิวินาที)
+        setInterval(drawTable, 1000); // รีเฟรชทุก 1 วินาที
 
         // ฟังก์ชันแสดงข้อความขอบคุณ
         function showThankYouMessage(event) {
@@ -143,7 +143,7 @@
             // Submit the form after displaying the thank you message
             setTimeout(function() {
                 form.submit();
-            }, 500); // Delay the form submission to allow message display
+            }, 2000); // Delay the form submission to allow message display
         }
 
         // เรียกใช้ฟังก์ชัน drawTable เมื่อโหลดหน้าเว็บ
