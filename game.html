@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falling Objects Shooter</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: url('/chirsmas/bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+
+        #gameCanvas {
+            display: block;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2em;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .score {
+            
+            
+            background-color: #ff5733;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5em;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .play-button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            color: white;
+            background-color: #ff5733;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.2s;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            animation: bounceIn 0.5s forwards;
+        }
+
+        .play-button:hover {
+            background-color: #c13c22;
+            transform: scale(1.1);
+        }
+
+        .play-button:active {
+            transform: scale(1);
+        }
+
+        /* การแอนิเมชั่นของปุ่มให้เด้งขึ้นมา */
+        @keyframes bounceIn {
+            0% {
+                transform: translate(-50%, 50%);
+            }
+            60% {
+                transform: translate(-50%, -30%);
+            }
+            80% {
+                transform: translate(-50%, 10%);
+            }
+            100% {
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .explosion {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+            animation: explosion-animation 0.5s forwards;
+        }
+
+        @keyframes explosion-animation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .score-increase {
+            position: absolute;
+            color: yellow;
+            font-size: 2em;
+            animation: score-bounce 0.5s forwards;
+        }
+
+        @keyframes score-bounce {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-10px);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameOver" class="game-over" style="display: none;">Game Over!</div>
+    <div id="score" class="score">Score: 0</div>
+    <button id="restartButton" class="play-button" onclick="restartGame()">Start New Game</button>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const playerWidth = 60;
+        const playerHeight = 40;
+        let playerX = canvas.width / 2 - playerWidth / 2;
+        const playerSpeed = 6;
+
+        const bullets = [];
+        const bulletSpeed = 5;
+
+        const fallingObjects = [];
+        const objectSpeed = 3;
+
+        let gameOver = false;
+        let score = 0;
+
+        function drawPlayer() {
+            ctx.fillStyle = 'green';
+            ctx.fillRect(playerX, canvas.height - playerHeight - 10, playerWidth, playerHeight);
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = 'red';
+            for (let i = 0; i < bullets.length; i++) {
+                ctx.fillRect(bullets[i].x, bullets[i].y, 10, 20);
+            }
+        }
+
+        function drawFallingObjects() {
+            ctx.fillStyle = 'yellow';
+            for (let i = 0; i < fallingObjects.length; i++) {
+                ctx.fillRect(fallingObjects[i].x, fallingObjects[i].y, 30, 30);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = 'Score: ' + score;
+        }
+
+        function update() {
+            if (gameOver) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (rightPressed && playerX + playerWidth < canvas.width) playerX += playerSpeed;
+            if (leftPressed && playerX > 0) playerX -= playerSpeed;
+
+            for (let i = 0; i < bullets.length; i++) {
+                bullets[i].y -= bulletSpeed;
+                if (bullets[i].y < 0) {
+                    bullets.splice(i, 1);
+                    i--;
+                }
+            }
+
+            for (let i = 0; i < fallingObjects.length; i++) {
+                fallingObjects[i].y += objectSpeed;
+
+                if (
+                    fallingObjects[i].x < playerX + playerWidth &&
+                    fallingObjects[i].x + 30 > playerX &&
+                    fallingObjects[i].y + 30 > canvas.height - playerHeight - 10
+                ) {
+                    gameOver = true;
+                    document.getElementById('gameOver').style.display = 'block';
+                    document.getElementById('restartButton').style.display = 'block';
+                }
+
+                if (fallingObjects[i].y > canvas.height) {
+                    fallingObjects.splice(i, 1);
+                    i--;
+                }
+            }
+
+            drawPlayer();
+            drawBullets();
+            drawFallingObjects();
+
+            for (let i = 0; i < bullets.length; i++) {
+                for (let j = 0; j < fallingObjects.length; j++) {
+                    if (
+                        bullets[i].x < fallingObjects[j].x + 30 &&
+                        bullets[i].x + 10 > fallingObjects[j].x &&
+                        bullets[i].y < fallingObjects[j].y + 30 &&
+                        bullets[i].y + 20 > fallingObjects[j].y
+                    ) {
+                        bullets.splice(i, 1);
+                        fallingObjects.splice(j, 1);
+                        i--;
+
+                        score++;
+                        createExplosion(fallingObjects[j].x, fallingObjects[j].y);
+                        showScoreIncrease(fallingObjects[j].x, fallingObjects[j].y);
+
+                        break;
+                    }
+                }
+            }
+
+            updateScore();
+
+            if (!gameOver) {
+                requestAnimationFrame(update);
+            }
+        }
+
+        function createFallingObject() {
+            if (gameOver) return;
+
+            const x = Math.random() * (canvas.width - 30);
+            fallingObjects.push({ x: x, y: -30 });
+
+            setTimeout(createFallingObject, 1000);
+        }
+
+        let rightPressed = false;
+        let leftPressed = false;
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key == 'Right' || e.key == 'ArrowRight') {
+                rightPressed = true;
+            }
+            if (e.key == 'Left' || e.key == 'ArrowLeft') {
+                leftPressed = true;
+            }
+            if (e.key == ' ' && !gameOver) {
+                bullets.push({ x: playerX + playerWidth / 2 - 5, y: canvas.height - playerHeight - 20 });
+            }
+        });
+
+        document.addEventListener('keyup', function (e) {
+            if (e.key == 'Right' || e.key == 'ArrowRight') {
+                rightPressed = false;
+            }
+            if (e.key == 'Left' || e.key == 'ArrowLeft') {
+                leftPressed = false;
+            }
+        });
+
+        function restartGame() {
+            score = 0;
+            fallingObjects.length = 0;
+            bullets.length = 0;
+            gameOver = false;
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('restartButton').style.display = 'none';
+            updateScore();
+            update();   
+            createFallingObject();
+        }
+
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.classList.add('explosion');
+            explosion.style.left = `${x - 15}px`;
+            explosion.style.top = `${y - 15}px`;
+            document.body.appendChild(explosion);
+            setTimeout(() => explosion.remove(), 1000);
+        }
+
+        function showScoreIncrease(x, y) {
+            const scoreIncrease = document.createElement('div');
+            scoreIncrease.classList.add('score-increase');
+            scoreIncrease.textContent = '+1';
+            scoreIncrease.style.left = `${x}px`;
+            scoreIncrease.style.top = `${y - 20}px`;
+            document.body.appendChild(scoreIncrease);
+            setTimeout(() => scoreIncrease.remove(), 500);
+        }
+
+        createFallingObject();
+        update();
+    </script>
+</body>
+</html>
