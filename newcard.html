@@ -96,25 +96,39 @@
         <ul id="wishList"></ul> <!-- รายการคำอวยพรจะไปแสดงที่นี่ -->
     </div>
 
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
-        // ดึงข้อมูลจาก Google Sheets
-        const sheetUrl = "https://spreadsheets.google.com/feeds/list/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/public/values?alt=json";
-        fetch(sheetUrl)
-            .then(response => response.json())
-            .then(data => {
-                const entries = data.feed.entry;
-                const wishList = document.getElementById('wishList');
+        // กำหนด Google Visualization API
+        google.charts.load('current', {
+            packages: ['corechart', 'table']
+        });
 
-                // แสดงคำอวยพรล่าสุด
-                entries.forEach(entry => {
-                    const name = entry.gsx$name.$t;
-                    const wish = entry.gsx$wish.$t;
-                    const listItem = document.createElement('li');
+        // ดึงข้อมูลจาก Google Sheets โดยใช้ Google Visualization API
+        google.charts.setOnLoadCallback(drawTable);
+
+        function drawTable() {
+            var queryString = encodeURIComponent('SELECT A, B'); // กำหนดคอลัมน์ที่ต้องการดึง (A = ชื่อ, B = คำอวยพร)
+            var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/gviz/tq?tq=' + queryString);
+            
+            query.send(function(response) {
+                if (response.isError()) {
+                    console.error('Error in query: ' + response.getMessage());
+                    return;
+                }
+
+                var data = response.getDataTable();
+                var wishList = document.getElementById('wishList');
+                
+                // แสดงข้อมูลคำอวยพรล่าสุด
+                for (var i = 0; i < data.getNumberOfRows(); i++) {
+                    var name = data.getValue(i, 0);  // คอลัมน์ A (ชื่อ)
+                    var wish = data.getValue(i, 1);  // คอลัมน์ B (คำอวยพร)
+                    var listItem = document.createElement('li');
                     listItem.textContent = `${name} - ${wish}`;
                     wishList.appendChild(listItem);
-                });
-            })
-            .catch(error => console.error('Error fetching data:', error));
+                }
+            });
+        }
 
         // การแสดงข้อความขอบคุณ
         function showThankYouMessage(event) {
