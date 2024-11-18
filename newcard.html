@@ -23,7 +23,7 @@
 
         #wish-form {
             margin-top: 30px;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.5); /* Transparent background */
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -60,7 +60,7 @@
         .thank-you-message {
             font-size: 1.5rem;
             color: white;
-            display: none;
+            display: none; /* Hide the message initially */
             margin-top: 30px;
         }
 
@@ -93,7 +93,7 @@
 
     <div id="recent-wishes">
         <h2>คำอวยพรล่าสุด</h2>
-        <ul id="wishList"></ul>
+        <ul id="wishList"></ul> <!-- รายการคำอวยพรจะไปแสดงที่นี่ -->
     </div>
 
     <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -105,7 +105,7 @@
 
         // ฟังก์ชันดึงข้อมูลจาก Google Sheets
         function drawTable() {
-            var queryString = encodeURIComponent('SELECT B, C OFFSET 1 ORDER BY A DESC'); // ดึงข้อมูลใหม่ล่าสุดก่อน
+            var queryString = encodeURIComponent('SELECT B, C OFFSET 1'); // ดึงข้อมูลจากคอลัมน์ B (ชื่อ) และ C (คำอวยพร) เริ่มจากแถวที่ 2
             var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/gviz/tq?tq=' + queryString);
             
             query.send(function(response) {
@@ -130,7 +130,7 @@
         }
 
         // เรียกใช้ drawTable() ทุก 1 วินาที (1000 มิลลิวินาที)
-        setInterval(drawTable, 500); // รีเฟรชทุก 1 วินาที
+        setInterval(drawTable, 1000); // รีเฟรชทุก 1 วินาที
 
         // ฟังก์ชันแสดงข้อความขอบคุณ
         function showThankYouMessage(event) {
