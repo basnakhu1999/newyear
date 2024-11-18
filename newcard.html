@@ -5,75 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy New Year Wishes</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background: url('christmas/bg.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: white;
-            text-align: center;
-        }
-
-        h1 {
-            margin-top: 50px;
-            font-size: 3rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        #wish-form {
-            margin-top: 30px;
-        }
-
-        #wish-input, #name-input {
-            padding: 10px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 5px;
-            width: 300px;
-            max-width: 80%;
-        }
-
-        .play-button {
-            margin-bottom: 20px;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            background-color: #ff5733;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .play-button:hover {
-            background-color: #c13c22;
-            transform: scale(1.1);
-        }
-
-        .play-button:active {
-            transform: scale(1);
-        }
-
-        #wishes-list {
-            margin-top: 50px;
-            padding: 0 20px;
-        }
-
-        #wishes-list ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        #wishes-list li {
-            background: rgba(255, 255, 255, 0.2);
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
+        /* CSS เหมือนเดิม */
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: url('christmas/bg.jpg') no-repeat center center fixed; background-size: cover; color: white; text-align: center; }
+        h1 { margin-top: 50px; font-size: 3rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); }
+        #wish-form { margin-top: 30px; }
+        #wish-input, #name-input { padding: 10px; font-size: 1.2rem; border: none; border-radius: 5px; width: 300px; max-width: 80%; }
+        .play-button { margin-bottom: 20px; padding: 15px 30px; font-size: 18px; font-weight: bold; color: white; background-color: #ff5733; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); transition: background-color 0.3s, transform 0.2s; }
+        .play-button:hover { background-color: #c13c22; transform: scale(1.1); }
+        .play-button:active { transform: scale(1); }
+        #wishes-list { margin-top: 50px; padding: 0 20px; }
+        #wishes-list ul { list-style: none; padding: 0; }
+        #wishes-list li { background: rgba(255, 255, 255, 0.2); margin: 10px 0; padding: 10px; border-radius: 5px; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
     </style>
 </head>
 <body>
@@ -83,14 +25,13 @@
         <input type="text" id="wish-input" placeholder="Type your wish here..." />
         <button class="play-button" onclick="submitWish()">Submit</button>
     </div>
-
     <div id="wishes-list">
         <h2>Recent Wishes:</h2>
         <ul id="wishes-container"></ul>
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxkqLDPqtzLO2UrY3RPuknZvi9aSsrRKn6VLOe9JLHAxauW50gtvC5ECRUXtMW11_w/exec'; // ใส่ URL ของ Google Apps Script ที่ได้รับจากการ deploy
+        const API_URL = 'https://script.google.com/macros/s/AKfycby2OFohA1-e8l3xKj-ML6llMrWcX2IQpuBV1e9w-XVIofJQcA171q9bI61WRHPbXOQ/exec'; // Replace with your Google Apps Script URL
 
         // Function to submit wish
         async function submitWish() {
@@ -102,48 +43,55 @@
                 return;
             }
 
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    'name': name,
-                    'wish': wish,
-                }),
-            });
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ 'name': name, 'wish': wish }),
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (data.result === 'success') {
-                alert('Wish submitted successfully!');
-                document.getElementById('name-input').value = '';
-                document.getElementById('wish-input').value = '';
-                fetchWishes();
-            } else {
-                console.error('Failed to submit wish:', data.message);
-                alert('Error: ' + data.message);
+                if (data.result === 'success') {
+                    alert('Wish submitted successfully!');
+                    document.getElementById('name-input').value = '';
+                    document.getElementById('wish-input').value = '';
+                    fetchWishes();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error submitting wish:', error.message);
+                alert('Failed to submit wish. Please try again later.');
             }
         }
 
         // Function to fetch wishes
         async function fetchWishes() {
-            const response = await fetch(API_URL, {
-                method: 'GET',
-            });
+            try {
+                const response = await fetch(API_URL, { method: 'GET' });
 
-            if (response.ok) {
-                const data = await response.json();
-                const wishesContainer = document.getElementById('wishes-container');
-                wishesContainer.innerHTML = '';
+                if (response.ok) {
+                    const data = await response.json();
+                    const wishesContainer = document.getElementById('wishes-container');
+                    wishesContainer.innerHTML = '';
 
-                data.wishes.forEach((wish) => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `${wish.name}: ${wish.wish}`;
-                    wishesContainer.appendChild(listItem);
-                });
-            } else {
-                console.error('Failed to fetch wishes:', await response.json());
+                    if (data.wishes && data.wishes.length > 0) {
+                        data.wishes.forEach((wish) => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `${wish.name}: ${wish.wish}`;
+                            wishesContainer.appendChild(listItem);
+                        });
+                    } else {
+                        wishesContainer.innerHTML = '<li>No wishes yet!</li>';
+                    }
+                } else {
+                    console.error('Failed to fetch wishes:', await response.json());
+                }
+            } catch (error) {
+                console.error('Error fetching wishes:', error.message);
             }
         }
 
