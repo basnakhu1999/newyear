@@ -105,7 +105,7 @@
 
         // ฟังก์ชันดึงข้อมูลจาก Google Sheets
         function drawTable() {
-            var queryString = encodeURIComponent('SELECT B, C OFFSET 0'); // ดึงข้อมูลจากคอลัมน์ B (ชื่อ) และ C (คำอวยพร) เริ่มจากแถวที่ 2
+            var queryString = encodeURIComponent('SELECT B, C OFFSET 1'); // ดึงข้อมูลจากคอลัมน์ B (ชื่อ) และ C (คำอวยพร) เริ่มจากแถวที่ 2
             var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/gviz/tq?tq=' + queryString);
             
             query.send(function(response) {
@@ -119,7 +119,7 @@
                 wishList.innerHTML = ''; // ล้างรายการคำอวยพรเดิมก่อน
 
                 // แสดงข้อมูลคำอวยพรล่าสุด
-                for (var i = 0; i < data.getNumberOfRows(); i++) {
+                for (var i = 1; i < data.getNumberOfRows(); i++) {
                     var name = data.getValue(i, 0);  // คอลัมน์ B (ชื่อ)
                     var wish = data.getValue(i, 1);  // คอลัมน์ C (คำอวยพร)
                     var listItem = document.createElement('li');
