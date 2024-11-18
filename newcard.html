@@ -119,7 +119,7 @@
                 wishList.innerHTML = ''; // ล้างรายการคำอวยพรเดิมก่อน
 
                 // แสดงข้อมูลคำอวยพรล่าสุด
-                for (var i = 1; i < data.getNumberOfRows(); i++) {
+                for (var i = 0; i < data.getNumberOfRows(); i++) {
                     var name = data.getValue(i, 0);  // คอลัมน์ B (ชื่อ)
                     var wish = data.getValue(i, 1);  // คอลัมน์ C (คำอวยพร)
                     var listItem = document.createElement('li');
@@ -130,7 +130,7 @@
         }
 
         // เรียกใช้ drawTable() ทุก 1 วินาที (1000 มิลลิวินาที)
-        setInterval(drawTable, 700); // รีเฟรชทุก 1 วินาที
+        setInterval(drawTable, 500); // รีเฟรชทุก 1 วินาที
 
         // ฟังก์ชันแสดงข้อความขอบคุณ
         function showThankYouMessage(event) {
