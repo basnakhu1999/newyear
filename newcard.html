@@ -105,7 +105,7 @@
 
         // ฟังก์ชันดึงข้อมูลจาก Google Sheets
         function drawTable() {
-            var queryString = encodeURIComponent('SELECT B, C OFFSET 1'); // ดึงข้อมูลจากคอลัมน์ B (ชื่อ) และ C (คำอวยพร) เริ่มจากแถวที่ 2
+            var queryString = encodeURIComponent('SELECT B, C OFFSET 0'); // ดึงข้อมูลจากคอลัมน์ B (ชื่อ) และ C (คำอวยพร) เริ่มจากแถวที่ 2
             var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/gviz/tq?tq=' + queryString);
             
             query.send(function(response) {
@@ -130,7 +130,7 @@
         }
 
         // เรียกใช้ drawTable() ทุก 1 วินาที (1000 มิลลิวินาที)
-        setInterval(drawTable, 1000); // รีเฟรชทุก 1 วินาที
+        setInterval(drawTable, 700); // รีเฟรชทุก 1 วินาที
 
         // ฟังก์ชันแสดงข้อความขอบคุณ
         function showThankYouMessage(event) {
