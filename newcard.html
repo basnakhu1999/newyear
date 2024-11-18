@@ -103,9 +103,7 @@
             packages: ['corechart', 'table']
         });
 
-        // ดึงข้อมูลจาก Google Sheets โดยใช้ Google Visualization API
-        google.charts.setOnLoadCallback(drawTable);
-
+        // ฟังก์ชันดึงข้อมูลจาก Google Sheets
         function drawTable() {
             var queryString = encodeURIComponent('SELECT A, B'); // กำหนดคอลัมน์ที่ต้องการดึง (A = ชื่อ, B = คำอวยพร)
             var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/13l44MMSccjpg9JhVMta44yaeah9DdYIjKGTW3drsHgU/gviz/tq?tq=' + queryString);
@@ -118,7 +116,8 @@
 
                 var data = response.getDataTable();
                 var wishList = document.getElementById('wishList');
-                
+                wishList.innerHTML = ''; // ล้างรายการคำอวยพรเดิมก่อน
+
                 // แสดงข้อมูลคำอวยพรล่าสุด
                 for (var i = 0; i < data.getNumberOfRows(); i++) {
                     var name = data.getValue(i, 0);  // คอลัมน์ A (ชื่อ)
@@ -130,7 +129,10 @@
             });
         }
 
-        // การแสดงข้อความขอบคุณ
+        // เรียกใช้งาน drawTable() ทุก 30 วินาที
+        setInterval(drawTable, 30000); // รีเฟรชทุก 30 วินาที
+
+        // ฟังก์ชันแสดงข้อความขอบคุณ
         function showThankYouMessage(event) {
             event.preventDefault(); // Prevent form submission for now
             const form = document.getElementById('wishForm');
@@ -143,6 +145,10 @@
                 form.submit();
             }, 2000); // Delay the form submission to allow message display
         }
+
+        // เรียกใช้ฟังก์ชัน drawTable เมื่อโหลดหน้าเว็บ
+        google.charts.setOnLoadCallback(drawTable);
+
     </script>
 
 </body>
