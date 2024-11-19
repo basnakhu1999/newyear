@@ -132,6 +132,8 @@
             packages: ['corechart', 'table']
         });
 
+        let previousDataCount = 0; // ตัวแปรเพื่อเก็บจำนวนคำอวยพรที่มีอยู่ก่อนหน้า
+
         // ฟังก์ชันดึงข้อมูลจาก Google Sheets
         function drawTable() {
             var queryString = encodeURIComponent('SELECT B, C OFFSET 1'); // ดึงข้อมูลจากคอลัมน์ B (ชื่อ) และ C (คำอวยพร) เริ่มจากแถวที่ 2
@@ -145,22 +147,26 @@
 
                 var data = response.getDataTable();
                 var wishList = document.getElementById('wishList');
-                wishList.innerHTML = ''; // ล้างรายการคำอวยพรเดิมก่อน
+                var currentDataCount = data.getNumberOfRows();
 
-                // แสดงข้อมูลคำอวยพรล่าสุด
-                for (var i = 0; i < data.getNumberOfRows(); i++) {
-                    var name = data.getValue(i, 0);  // คอลัมน์ B (ชื่อ)
-                    var wish = data.getValue(i, 1);  // คอลัมน์ C (คำอวยพร)
-                    var wishBox = document.createElement('div');
-                    wishBox.className = 'wish-box';
-                    wishBox.textContent = `${name} - ${wish}`;
-                    wishList.appendChild(wishBox);
+                // เช็คว่ามีคำอวยพรใหม่หรือไม่
+                if (currentDataCount > previousDataCount) {
+                    // เพิ่มคำอวยพรใหม่ที่มีการเพิ่มเข้ามา
+                    for (var i = previousDataCount; i < currentDataCount; i++) {
+                        var name = data.getValue(i, 0);  // คอลัมน์ B (ชื่อ)
+                        var wish = data.getValue(i, 1);  // คอลัมน์ C (คำอวยพร)
+                        var wishBox = document.createElement('div');
+                        wishBox.className = 'wish-box';
+                        wishBox.textContent = `${name} - ${wish}`;
+                        wishList.appendChild(wishBox);
+                    }
+                    previousDataCount = currentDataCount; // อัปเดตจำนวนข้อมูลล่าสุด
                 }
             });
         }
 
-        // เรียกใช้ drawTable() ทุก 1 วินาที (1000 มิลลิวินาที)
-        setInterval(drawTable, 60000); // รีเฟรชทุก 1 วินาที
+        // เรียกใช้ฟังก์ชัน drawTable ทุก 5 วินาที (5000 มิลลิวินาที)
+        setInterval(drawTable, 5000); // รีเฟรชทุก 5 วินาที
 
         // ฟังก์ชันแสดงข้อความขอบคุณ
         function showThankYouMessage(event) {
