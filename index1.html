@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sheets Data Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    table th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Google Sheets Data</h1>
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>Column 2</th>
+        <th>Column 3</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkry4emgfWZFZhEPdJMEvscXgmwb3hAZNqNOy1KaHfyidXSdXFsh-Y6ouMYmwRj3EMFcIcHrW2pZ4K/pub?output=csv";
+
+    async function fetchData() {
+      try {
+        const response = await fetch(sheetURL);
+        const data = await response.text();
+        
+        // ตรวจสอบว่า data ถูกดึงมาได้หรือไม่
+        console.log(data); // ลองดูข้อมูลที่ได้รับ
+
+        const rows = data.split("\n").slice(1); // ตัด Header ออก
+
+        const tableBody = document.querySelector("#data-table tbody");
+        tableBody.innerHTML = ""; // ล้างข้อมูลเก่า
+
+        rows.forEach(row => {
+          // กำหนดให้แยกคอลัมน์ด้วยเครื่องหมายคอมม่า
+          const cols = row.split(",").map(col => col.trim()); // ใช้ .trim() เพื่อลบช่องว่างที่ไม่จำเป็น
+
+          // ตรวจสอบว่าแถวนี้มีข้อมูลหรือไม่
+          if (cols.length >= 3) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `<td>${cols[1]}</td><td>${cols[2]}</td>`; // แสดงคอลัมน์ที่ 2 และ 3
+            tableBody.appendChild(tr);
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 5000); // อัปเดตข้อมูลทุก 5 วินาที
+  </script>
+</body>
+</html>
