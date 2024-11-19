@@ -56,6 +56,7 @@
         const rows = data.split("\n").slice(1); // ตัด Header ออก
 
         const tableBody = document.querySelector("#data-table tbody");
+        tableBody.innerHTML = ""; // ล้างข้อมูลเก่า
 
         rows.forEach(row => {
           const cols = row.split(",").map(col => col.trim()); // ใช้ .trim() เพื่อลบช่องว่างที่ไม่จำเป็น
