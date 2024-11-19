@@ -38,7 +38,7 @@
   </table>
 
   <script>
-    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkry4emgfWZFZhEPdJMEvscXgmwb3hAZNqNOy1KaHfyidXSdXFsh-Y6ouMYmwRj3EMFcIcHrW2pZ4K/pub?output=csv";
+    const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSkry4emgfWZFZhEPdJMEvscXgmwb3hAZNqNOy1KaHfyidXSdXFsh-Y6ouMYmwRj3EMFcIcHrW2pZ4K/pubhtml";
 
     async function fetchData() {
       try {
@@ -70,7 +70,7 @@
     }
 
     fetchData();
-    setInterval(fetchData, 500); // อัปเดตข้อมูลทุก 5 วินาที
+    setInterval(fetchData, 1000); // อัปเดตข้อมูลทุก 5 วินาที
   </script>
 </body>
 </html>
