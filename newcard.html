@@ -70,6 +70,35 @@
             padding: 20px;
             background-color: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Style for the individual wish boxes */
+        .wish-box {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border-radius: 15px;
+            margin: 10px;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: floatUp 1s forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
     </style>
@@ -93,7 +122,7 @@
 
     <div id="recent-wishes">
         <h2>คำอวยพรล่าสุด</h2>
-        <ul id="wishList"></ul> <!-- รายการคำอวยพรจะไปแสดงที่นี่ -->
+        <div id="wishList"></div> <!-- รายการคำอวยพรจะไปแสดงที่นี่ -->
     </div>
 
     <script src="https://www.gstatic.com/charts/loader.js"></script>
@@ -122,9 +151,10 @@
                 for (var i = 0; i < data.getNumberOfRows(); i++) {
                     var name = data.getValue(i, 0);  // คอลัมน์ B (ชื่อ)
                     var wish = data.getValue(i, 1);  // คอลัมน์ C (คำอวยพร)
-                    var listItem = document.createElement('li');
-                    listItem.textContent = `${name} - ${wish}`;
-                    wishList.appendChild(listItem);
+                    var wishBox = document.createElement('div');
+                    wishBox.className = 'wish-box';
+                    wishBox.textContent = `${name} - ${wish}`;
+                    wishList.appendChild(wishBox);
                 }
             });
         }
