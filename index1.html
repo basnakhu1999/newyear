@@ -56,7 +56,6 @@
         const rows = data.split("\n").slice(1); // ตัด Header ออก
 
         const tableBody = document.querySelector("#data-table tbody");
-        tableBody.innerHTML = ""; // ล้างข้อมูลเก่า
 
         rows.forEach(row => {
           const cols = row.split(",").map(col => col.trim()); // ใช้ .trim() เพื่อลบช่องว่างที่ไม่จำเป็น
@@ -64,7 +63,7 @@
           if (cols.length >= 3) {
             const tr = document.createElement("tr");
             tr.innerHTML = `<td>${cols[1]}</td><td>${cols[2]}</td>`; // แสดงคอลัมน์ที่ 2 และ 3
-            tableBody.appendChild(tr);
+            tableBody.appendChild(tr); // เพิ่มแถวใหม่
           }
         });
       } catch (error) {
