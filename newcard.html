@@ -158,7 +158,9 @@
                         var wishBox = document.createElement('div');
                         wishBox.className = 'wish-box';
                         wishBox.textContent = `${name} - ${wish}`;
-                        wishList.appendChild(wishBox);
+                        
+                        // เพิ่มคำอวยพรใหม่ที่ด้านบนสุดของรายการ
+                        wishList.prepend(wishBox);
                     }
                     previousDataCount = currentDataCount; // อัปเดตจำนวนข้อมูลล่าสุด
                 }
